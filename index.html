@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+  <link rel="stylesheet" href="main.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> 
+  <link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet">
+    
+    <style>
+        
+        body {
+            
+            overflow: hidden;
+            font-family: 'Abel', sans-serif;
+            background-image: url(bkgd2.png);
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            
+        }
+    
+        .bannerDiv {
+                
+                background-image: url(banner.png);  
+                padding: 10px;
+                border-top: 1px black solid;
+                border-bottom: 1px black solid;
+                
+        }
+        
+        .rounded {
+            
+            border-radius: 5px;
+            border: 1px black solid;
+            
+            
+        }
+        
+        #containerDiv {
+            
+            background: url(bkgd.png);
+        }
+        
+        #lovelyDiv { cursor: url('cursor.cur'), auto; }
+        #PlayDiv { cursor: url('cursor.cur'), auto; }
+        #PlayAgainDiv { cursor: url('cursor.cur'), auto; }
+        
+        #lovelyDiv { 
+            
+            opacity: 0.5; 
+
+        }
+        
+        #scoreboardDiv {
+            
+            background-image: url(scorebd.png);
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+             
+        }
+
+        .disp {
+            
+            font-size: 2em;
+        }
+        
+        
+                    
+    </style>
+    
+   
+    
+    <script>
+   
+        
+        
+$(document).ready(function(){
+    
+    
+    var colourCount = 1;
+      
+    var score = 0;
+    var count = 0;
+    var counterTime = 20;
+    
+    var highScore = localStorage.getItem('highScore') || 0;
+
+    function getRandomColor() {
+  
+                colourCount += 1
+                
+                if (colourCount > 5) {
+                    
+                    colourCount = 1;
+                } 
+                
+                switch(colourCount) {
+                    case 1: 
+                        return "blue"
+                        break;
+                    case 2:
+                        return "grey"
+                        break;
+                    case 3:
+                        return "#00ffcc"
+                        break;
+                    case 4:
+                        return "#99ff66"
+                        break;
+                    case 5:
+                        return "red"
+                        break;
+                    
+                }
+                                          
+    }  
+                   
+    function getHalfSize() {   
+        
+        var hsize = getComputedStyle(document.getElementById("lovelyDiv")).getPropertyValue("height");
+        hsize = hsize.replace('px', '');
+        
+        if (count < 5) {
+        
+            var hsize = hsize / 1.25;
+            
+            return hsize;
+        
+        }
+        
+        else { return hsize; };
+    
+    } // halfs size of block for first 5 successful hits
+
+    function relocate() {
+    
+        var x = Math.floor((Math.random() * 900) + 1);
+        var y = Math.floor((Math.random() * 450) + 1);
+       
+        var w = (getComputedStyle(document.getElementById("lovelyDiv")).getPropertyValue("width"))
+        var wInt = parseInt(w.replace('px', ''));
+        
+        var range = x + wInt; // range is equal to spawn point on X axis + the width (and height) of the block
+        var rangey = y + wInt; // rangey is same but for y axis
+        
+        if (range > 900) { // If spawn point along x axis in addition to the width of the block is MORE than play area length, spawn point
+                           // is set to the right of the canvas subtracting from that the width of the block, to keep it inside.
+                      
+            x = 900 - wInt;
+        }        
+        
+        $('#lovelyDiv').css('left', x);
+               
+        if (rangey > 450) { // Same functionality for the Y axis
+                      
+            y = 450 - wInt;
+        }        
+            
+        $('#lovelyDiv').css('top', y);
+        
+                          
+    } // relocates block within play area
+    
+    function scorecountUp() {
+        
+        count += 1;
+        
+        if (count > 25) {
+        score = score * 2;
+        }
+        
+        else {
+            
+            score = score + 10;
+        }
+                    
+        $('#ScoreDiv').text(score);
+        $('#blocksHit').text(count);
+        
+    }
+           
+    $('#lovelyDiv').click(function() {
+       
+       relocate();
+             
+        $(this).css('background-color', getRandomColor())
+        $(this).css('width', getHalfSize())
+        $(this).css('height', getHalfSize())
+       
+        scorecountUp();     
+                
+                
+    });
+    
+    $('#PlayDiv').click(function() {
+        
+        $('#lovelyDiv').css("visibility", "visible");
+        
+         var interval = setInterval(function() {
+        
+             counterTime -- ;
+                
+            $('#counterTimeDiv').text(counterTime);
+    
+            if (counterTime == 0) {
+        
+                clearInterval(interval);
+                
+                $('#lovelyDiv').hide();
+                
+                $('#againDiv').css("visibility", "visible");
+                
+                if (score > highScore) {
+                
+                    // Set the high score to the users' current points
+                    highScore = score;
+                    // Store the high score
+                    localStorage.setItem('highScore', highScore);
+                
+                }
+                
+                document.getElementById("scoreSpan").innerHTML = score;
+                document.getElementById("highscoreSpan").innerHTML = highScore;
+                
+                
+        
+            }
+    
+        }, 1000);
+        
+        $('#instructions').hide();     
+        
+    });
+    
+    $('#PlayAgainDiv').click(function() {
+        
+        location.reload();
+    });
+                
+        
+
+        
+    });
+      
+</script>
+
+    
+</head>
+
+<body>
+    
+    <!-- SCORE BOARD -->
+    
+    <div class="rounded" id="scoreboardDiv" style="width: 18%; height: 80%; position: absolute; display: inline; margin-top: 20px; margin-left: 5px; top: 27.5px;">
+        
+        <div class="bannerDiv" style="margin: auto; text-align: center; position: relative; top: 5vh;">
+            SCORE</div>
+        
+        <div id="ScoreDiv" class="disp" style="margin: auto; text-align: center; position: relative; top: 10vh;">
+            0</div>
+        
+        <div class="bannerDiv" style="margin: auto; text-align: center; position: relative; top: 15vh;">
+            TIME</div>
+        
+        <div id="counterTimeDiv" class="disp" style="margin: auto; text-align: center; position: relative; top: 20vh;">
+            20</div>
+        
+        <div class="bannerDiv" style="margin: auto; text-align: center; position: relative; top: 25vh;">
+            BLOCKS MINED</div>
+        
+        <div id="blocksHit" class="disp" style="margin: auto; text-align: center; position: relative; top: 30vh;">
+            0</div>
+            
+    </div>
+        
+    <!-- PLAY AREA -->
+        
+    <div id="containerDiv" style="padding: 50px; border: solid black 2px; width: 900px; height: 450px; margin-left: 22.5%; margin-top: 20px; display: inline-block;" >
+  
+    <!-- INSTRUCTIONS -->
+        
+    <div class="rounded" id="instructions" style="width: 400px; height: 450px; float: right; background: rgba(200, 54, 54, 0.5); position: relative; margin-right: 250px;">
+        
+        <div style="padding-left: 30px; padding-right: 30px;">
+        
+        <h1 style="text-align: center; font-weight: 100">
+        Instructions    
+        </h1>
+        
+        <h3 style="text-align: center; font-weight: 100">
+        Click on the blocks to mine them as quickly as possible. 
+        <br/><br/>              
+        You have 20 seconds to mine as many blocks as you can, after mining 25 blocks, your score will increase exponentially with each block mined.
+        <br/><br/><br/>          
+        Click "Play" to begin!
+        </h3>    
+        
+    
+        <div class="rounded" id="PlayDiv" style="width: 150px; height: 50px; background-color: azure; position: relative; margin: 10% auto; text-align: center;">
+            <div style="position: relative; top: 30%;">
+                PLAY       
+            </div>
+        </div>
+        
+            
+            
+    </div>
+            
+    </div>
+        
+    <!-- TIME OUT -->    
+        
+    <div class="rounded" id="againDiv" style="width: 400px; height: 210px; visibility: hidden; position: absolute; display: inline; background-color: aquamarine; left: 42.5%; top: 20%; background: rgba(152, 216, 131, 0.5)">
+        
+        <div style="padding-left: 30px; padding-right: 30px;">
+        
+        <h4 style="text-align: center">
+        Time's Up! 
+        <br/><br/>          
+        You scored <span id="scoreSpan"></span> 
+        <br/><br/>
+        Your high score is <span id="highscoreSpan"></span>
+        </h4>    
+        
+    
+        <div class="rounded" id="PlayAgainDiv" style="width: 150px; height: 50px; background-color: azure; position: relative; margin: 5% auto; text-align: center;">
+            <div style="position: relative; top: 30%;">
+                PLAY AGAIN      
+            </div>
+        </div>
+        
+        </div>
+        
+        </div>
+        
+    <!-- BLOCK -->    
+        
+    <div class="rounded" id="lovelyDiv" style="visibility: hidden; width: 300px; height: 300px; background-color: blue; position: relative; left: 0px;"/>
+    
+    </div>
+        
+</body>
+    
+</html>
